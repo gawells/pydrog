@@ -59,3 +59,19 @@ def readpsf(psffile,sel,label=False):
   if label:
     cmd.do("stored.fftypes_tmp = stored.%s_fftypes"%objname[0]) # use tmp list that gets consumed by 'alter'
     cmd.do("label "+sel+", \"%s %1.2f %s\"%(name, partial_charge, stored.fftypes_tmp.pop())")
+
+def nohydro(model="(all)"):
+   '''
+DESCRIPTION
+
+   Hide hydrogens shown as lines or sticks.
+
+USAGE
+
+   spikes
+   spikes selection
+
+   '''
+   
+   cmd.do("hide lines, %s & (hydro)"%model)
+   cmd.do("hide sticks,%s & (hydro)"%model)
