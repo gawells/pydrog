@@ -3,11 +3,11 @@ def getpartial(file,sel):
   Get partial charges from file. Must be in same order as external ids
   '''
   
-   charges = open(file).read()
-   chargearray = charges.split()
-   cmd.do("print %s"%chargearray)
-   i = 1
-   for fx in chargearray:
+  charges = open(file).read()
+  chargearray = charges.split()
+  cmd.do("print %s"%chargearray)
+  i = 1
+  for fx in chargearray:
       cmd.do("print %s"%fx)
       cmd.do("alter (id %s) and (%s), partial_charge=%s"%(i,sel,fx))
       i += 1
@@ -75,3 +75,8 @@ USAGE
    
    cmd.do("hide lines, %s & (hydro)"%model)
    cmd.do("hide sticks,%s & (hydro)"%model)
+
+cmd.extend("getpartial",getpartial)
+cmd.extend("readpsf",readpsf)
+
+
