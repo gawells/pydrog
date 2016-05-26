@@ -12,9 +12,18 @@ def getpartial(file,sel):
       cmd.do("alter (id %s) and (%s), partial_charge=%s"%(i,sel,fx))
       i += 1
 
+def sum_partials(sel):
+  pymol.stored.partial_charges = []
+  pymol.stored.names = []
+  cmd.iterate("%s"%sel,"stored.partial_charges.append((name,partial_charge))")
+  sum = 0
+  for (name,charge) in pymol.stored.partial_charges:
+    sum += charge
+    print "%s %s"%(name,charge)
+  print sum
 
 
-def readpsf(psffile,sel,label=False):
+def readpsf(psffile,sel,label='0'):
   '''
   Read partial charges and atom-types from a .psf topology file. 
   Atom types are stored in 'stored.<objectname>_fftyes'. If label 
@@ -56,9 +65,22 @@ def readpsf(psffile,sel,label=False):
   # reverse list since "alter" must consume elements from "stored" objects
   cmd.do("stored.%s_fftypes.reverse()"%objname[0])
 
-  if label:
+  if label == '1':
     cmd.do("stored.fftypes_tmp = stored.%s_fftypes"%objname[0]) # use tmp list that gets consumed by 'alter'
     cmd.do("label "+sel+", \"%s %1.2f %s\"%(name, partial_charge, stored.fftypes_tmp.pop())")
+  elif label == '2':
+    cmd.do("stored.fftypes_tmp = stored.%s_fftypes"%objname[0]) # use tmp list that gets consumed by 'alter'
+    cmd.do("label "+sel+", \"%s / %s\"%(name, stored.fftypes_tmp.pop())")
+  elif label == '3':
+    cmd.do("stored.fftypes_tmp = stored.%s_fftypes"%objname[0]) # use tmp list that gets consumed by 'alter'
+    cmd.do("label "+sel+", \"%s\"%(stored.fftypes_tmp.pop())")
+  print (objname)
+
+def label_fftype(sel):
+  objname = cmd.get_object_list('%s'%sel)
+  cmd.do("stored.fftypes_tmp = stored.%s_fftypes"%objname[0]) # use tmp list that gets consumed by 'alter'
+  cmd.do("label "+sel+", \"%s - %s\"%(name, stored.fftypes_tmp.pop())")
+  
 
 def nohydro(model="(all)"):
    '''
@@ -78,5 +100,7 @@ USAGE
 
 cmd.extend("getpartial",getpartial)
 cmd.extend("readpsf",readpsf)
+cmd.extend("label_fftype",label_fftype)
+cmd.extend("sum_partials",sum_partials)
 
 
